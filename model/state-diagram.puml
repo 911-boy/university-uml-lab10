@@ -1,0 +1,27 @@
+@startuml
+title Диаграмма состояний класса Project (прецеденты «Создать проект» и «Изменить состояние проекта»)
+skinparam shadowing false
+hide empty description
+
+state Planned : CanAcceptParticipants() = true
+state Planned : JoinProject() / AddParticipation(part)
+state Active : CanAcceptParticipants() = true
+state Active : JoinProject() / AddParticipation(part)
+state Completed : CanAcceptParticipants() = false
+state Cancelled : CanAcceptParticipants() = false
+
+[*] --> Planned : new Project(name, startDate, endDate)
+Planned --> Active : Start()
+Planned --> Cancelled : Cancel()
+Active --> Completed : Finish() [GetParticipations().Count > 0]
+Active --> Cancelled : Cancel()
+Completed --> [*]
+Cancelled --> [*]
+
+note right of Planned
+  Недопустимый переход (например,
+  Finish() из Planned) бросает
+  InvalidOperationException,
+  состояние не меняется.
+end note
+@enduml

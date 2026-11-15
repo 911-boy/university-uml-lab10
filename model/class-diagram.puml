@@ -1,0 +1,170 @@
+@startuml
+' Сгенерировано автоматически ReverseUml.exe из University.exe — не править руками
+title Диаграмма классов (обратная разработка из University.exe)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+class AdministrativeEmployee {
+  +AdministrativeEmployee(ssNo : int, name : String, email : String)
+  +GetPosition() : String
+}
+
+class ConsoleUI {
+  -input : TextReader
+  -output : TextWriter
+  +ConsoleUI(university : University, input : TextReader, output : TextWriter)
+  +Run() : void
+  -PrintMenu() : void
+  +AddFaculty() : void
+  +AddInstitute() : void
+  +HireEmployee() : void
+  +AppointDean() : void
+  +AttachToInstitute() : void
+  +CreateProject() : void
+  +IncludeInProject() : void
+  +ChangeProjectState() : void
+  +CreateCourse() : void
+  +AssignLecturer() : void
+  +ShowReport() : void
+  +LoadDemo() : void
+  -RequireFaculty(name : String) : Faculty
+  -RequireInstitute(facultyName : String, instituteName : String) : Institute
+  -RequireEmployee(ssNo : int) : Employee
+  -RequireResearcher(ssNo : int) : ResearchAssociate
+  -RequireLecturer(ssNo : int) : Lecturer
+  -RequireProject(name : String) : Project
+  -RequireCourse(id : int) : Course
+  -ReadLine(prompt : String) : String
+  -ReadInt(prompt : String) : int
+  -ReadFloat(prompt : String) : float
+  -ReadDate(prompt : String) : Date
+}
+
+class Course {
+  +Id : int
+  +Name : String
+  +WeeklyDuration : float
+  +Course(id : int, name : String, weeklyDuration : float)
+  +AddLecturer(lecturer : Lecturer) : void
+  +GetLecturers() : IList<Lecturer>
+  +GetInfo() : String
+}
+
+abstract class Employee {
+  {static} -counter : int
+  +SsNo : int
+  +Name : String
+  +Email : String
+  #Employee(ssNo : int, name : String, email : String)
+  {static} +GetCounter() : int
+  {abstract} +GetPosition() : String
+  +GetInfo() : String
+}
+
+class Faculty {
+  +Name : String
+  +Faculty(name : String)
+  +AddInstitute(name : String, address : String) : Institute
+  +FindInstitute(name : String) : Institute
+  +GetInstitutes() : IList<Institute>
+  +SetDean(employee : Employee) : void
+  +GetDean() : Employee
+}
+
+class Institute {
+  +Name : String
+  +Address : String
+  +Institute(name : String, address : String)
+  +AddResearcher(researcher : ResearchAssociate) : void
+  +GetResearchers() : IList<ResearchAssociate>
+}
+
+class Lecturer {
+  +Lecturer(ssNo : int, name : String, email : String, fieldOfStudy : String, institute : Institute)
+  +Teach(course : Course) : void
+  +GetCourses() : IList<Course>
+  +GetPosition() : String
+  +GetInfo() : String
+}
+
+class Participation <<association class>> {
+  +Hours : int
+  +Participation(researcher : ResearchAssociate, project : Project, hours : int)
+}
+
+class Program <<static>> {
+  {static} +Main(args : String[]) : void
+}
+
+class Project {
+  +Name : String
+  +StartDate : Date
+  +EndDate : Date
+  +State : ProjectState
+  +Project(name : String, startDate : Date, endDate : Date)
+  +Start() : void
+  +Finish() : void
+  +Cancel() : void
+  +CanAcceptParticipants() : bool
+  +AddParticipation(participation : Participation) : void
+  +GetParticipations() : IList<Participation>
+  +GetTotalHours() : int
+  +GetInfo() : String
+}
+
+enum ProjectState {
+  Planned
+  Active
+  Completed
+  Cancelled
+}
+
+class ResearchAssociate {
+  +FieldOfStudy : String
+  +ResearchAssociate(ssNo : int, name : String, email : String, fieldOfStudy : String, institute : Institute)
+  +AttachTo(institute : Institute) : void
+  +GetInstitutes() : IList<Institute>
+  +JoinProject(project : Project, hours : int) : Participation
+  +GetParticipations() : IList<Participation>
+  +GetTotalHours() : int
+  +GetPosition() : String
+  +GetInfo() : String
+}
+
+class University {
+  +Name : String
+  +University(name : String)
+  +AddFaculty(name : String) : Faculty
+  +FindFaculty(name : String) : Faculty
+  +GetFaculties() : IList<Faculty>
+  +AppointDean(faculty : Faculty, employee : Employee) : void
+  +Hire(employee : Employee) : void
+  +FindEmployee(ssNo : int) : Employee
+  +GetEmployees() : IList<Employee>
+  +GetNumberOfEmployees() : int
+  +AddProject(project : Project) : void
+  +FindProject(name : String) : Project
+  +GetProjects() : IList<Project>
+  +AddCourse(course : Course) : void
+  +FindCourse(id : int) : Course
+  +GetCourses() : IList<Course>
+  +PrintReport(output : TextWriter) : void
+}
+
+
+Employee <|-- AdministrativeEmployee
+ConsoleUI "1" -- "1" University : manages >
+Faculty "0..1" -- "1 +dean" Employee : < leads
+Faculty "1" *-- "1..*" Institute
+Institute "1..*" o-- "1..*" ResearchAssociate
+ResearchAssociate <|-- Lecturer
+Lecturer "1..*" -- "1..*" Course : teaches >
+ResearchAssociate "1..*" -- "0..*" Project
+(ResearchAssociate, Project) .. Participation
+Employee <|-- ResearchAssociate
+University "1" *-- "1..*" Faculty
+University "1" o-- "0..*" Employee : employs >
+University "1" o-- "0..*" Project
+University "1" o-- "0..*" Course
+@enduml

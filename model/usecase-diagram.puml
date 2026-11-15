@@ -1,0 +1,50 @@
+@startuml
+title Диаграмма прецедентов: «Университетская информационная система»
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+actor "Пользователь ИС" as User
+actor "Администратор ИС" as Admin
+actor "Отдел кадров" as HR
+actor "Научный отдел" as Science
+actor "Учебный отдел" as Edu
+
+User <|-- Admin
+User <|-- HR
+User <|-- Science
+User <|-- Edu
+
+rectangle "Университетская информационная система" {
+  usecase "Добавить факультет\n(меню 1)" as UC1
+  usecase "Добавить кафедру\nна факультет (меню 2)" as UC2
+  usecase "Принять сотрудника\n(меню 3)" as UC3
+  usecase "Назначить декана\n(меню 4)" as UC4
+  usecase "Прикрепить научного\nсотрудника к кафедре (меню 5)" as UC5
+  usecase "Создать проект\n(меню 6)" as UC6
+  usecase "Включить научного\nсотрудника в проект (меню 7)" as UC7
+  usecase "Изменить состояние\nпроекта (меню 8)" as UC8
+  usecase "Создать курс\n(меню 9)" as UC9
+  usecase "Назначить преподавателя\nна курс (меню 10)" as UC10
+  usecase "Просмотреть отчёт\n(меню 11)" as UC11
+  usecase "Найти сотрудника\nпо соц. коду" as FIND
+}
+
+Admin -- UC1
+Admin -- UC2
+HR -- UC3
+HR -- UC4
+HR -- UC5
+Science -- UC6
+Science -- UC7
+Science -- UC8
+Edu -- UC9
+Edu -- UC10
+User -- UC11
+
+UC4 ..> FIND : <<include>>
+UC5 ..> FIND : <<include>>
+UC7 ..> FIND : <<include>>
+UC9 ..> FIND : <<include>>
+UC10 ..> FIND : <<include>>
+@enduml

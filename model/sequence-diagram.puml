@@ -1,0 +1,55 @@
+@startuml
+title Диаграмма последовательностей: прецедент «Включить научного сотрудника в проект» (меню 7)
+skinparam shadowing false
+autonumber
+
+actor "Научный отдел" as A
+participant "ui : ConsoleUI" as UI
+participant "university : University" as U
+participant "ra : ResearchAssociate" as RA
+participant "project : Project" as P
+participant "part : Participation" as PA
+
+A -> UI : выбирает пункт 7
+activate UI
+UI -> UI : IncludeInProject()
+UI -> UI : ReadInt("Соц. код научного сотрудника")
+A -> UI : ssNo
+UI -> UI : RequireResearcher(ssNo)
+UI -> U : FindEmployee(ssNo)
+activate U
+U --> UI : employee : Employee
+deactivate U
+note right of UI : employee приводится к ResearchAssociate,\nиначе — ошибка «не научный сотрудник»
+UI -> UI : ReadLine("Проект")
+A -> UI : name
+UI -> UI : RequireProject(name)
+UI -> U : FindProject(name)
+activate U
+U --> UI : project : Project
+deactivate U
+UI -> UI : ReadInt("Часов в проекте")
+A -> UI : hours
+
+UI -> RA : JoinProject(project, hours)
+activate RA
+RA -> P : CanAcceptParticipants()
+activate P
+P --> RA : bool
+deactivate P
+
+alt CanAcceptParticipants() = true (проект Planned или Active)
+  create PA
+  RA -> PA : <<create>> Participation(ra, project, hours)
+  RA -> P : AddParticipation(part)
+  activate P
+  deactivate P
+  RA --> UI : part : Participation
+  UI --> A : «… включён(а) в проект … на hours ч»
+else проект Completed или Cancelled
+  RA --> UI : InvalidOperationException
+  UI --> A : «ОШИБКА: … включать участников нельзя»
+end
+deactivate RA
+deactivate UI
+@enduml

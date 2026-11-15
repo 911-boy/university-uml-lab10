@@ -1,0 +1,44 @@
+@startuml
+title Диаграмма активностей: прецедент «Принять сотрудника» (меню 3, ConsoleUI.HireEmployee)
+skinparam shadowing false
+
+|Отдел кадров|
+start
+:Выбрать тип сотрудника\n(1 — административный, 2 — научный, 3 — преподаватель);
+:Ввести социальный код;
+|Система|
+if (university.FindEmployee(ssNo) != null?) then (да)
+  :Сообщить «Сотрудник с таким кодом уже есть»;
+  stop
+endif
+|Отдел кадров|
+:Ввести имя и e-mail;
+|Система|
+if (e-mail содержит «@»?) then (нет)
+  :Сообщить «Некорректный e-mail»;
+  stop
+endif
+if (тип сотрудника?) then (1)
+  :new AdministrativeEmployee(ssNo, name, email);
+else (2 или 3)
+  |Отдел кадров|
+  :Ввести область исследований;
+  :Указать факультет и кафедру;
+  |Система|
+  if (RequireInstitute(факультет, кафедра) нашла кафедру?) then (нет)
+    :Сообщить «Кафедра не найдена»;
+    stop
+  endif
+  if (тип = 2?) then (да)
+    :new ResearchAssociate(..., institute);
+  else (нет)
+    :new Lecturer(..., institute);
+  endif
+  :AttachTo(institute)\n(сотрудник прикреплён минимум к одной кафедре);
+endif
+:university.Hire(employee);
+:Вывести employee.GetInfo();
+|Отдел кадров|
+:Видит карточку нового сотрудника;
+stop
+@enduml
